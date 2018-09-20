@@ -9,12 +9,178 @@
     body {
       margin: 0;
       height: 100vh;
-      background: url('r211.jpg') center / contain no-repeat, black;
+      background: black;
+      overflow: hidden;
+    }
+
+    div {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: url('r211.jpg') center / auto 110% no-repeat, black;
     }
   </style>
 </head>
 
 <body>
 </body>
+
+<script>
+  const settings = {
+    layers : 3,
+
+    blend : {
+      modes : [
+        'normal',
+        'multiply',
+        'screen',
+        'overlay',
+        'darken',
+        'lighten',
+        'color-dodge',
+        'color-burn',
+        'hard-light',
+        'soft-light',
+        'difference',
+        'exclusion',
+        'hue',
+        'saturation',
+        'color',
+        'luminosity',
+      ],
+
+      delay : {
+        min :  100,
+        max : 1000,
+      },
+    },
+
+    filter : {
+      blur : {
+        probability : 0.2,
+
+        min : 1,
+        max : 8,
+        def : 0,
+
+        symbol : 'px',
+
+      },
+
+      brightness : {
+        probability : 0.5,
+
+        min :    0,
+        max : 1000,
+        def :  100,
+
+        symbol : '%',
+      },
+
+      contrast : {
+        probability : 0.5,
+
+        min :    0,
+        max : 1000,
+        def :  100,
+
+        symbol : '%',
+      },
+
+      saturate : {
+        probability : 0.5,
+
+        min :    0,
+        max : 1000,
+        def :  100,
+
+        symbol : '%',
+      },
+
+      delay : {
+        min : 100,
+        max : 200,
+      },
+    },
+
+    jitter : {
+      x : 3,
+      y : 2,
+
+      delay : {
+        min : 100,
+        max : 200,
+      },
+    },
+  };
+
+  const f = {
+    randomIntegerInclusive : (min, max) => {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    },
+
+    randomFloat : (min, max) => Math.random() * (max - min) + min,
+
+    randomItem : array => array[Math.floor(Math.random() * array.length)],
+
+    shuffleArray : array => {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+      }
+
+      return array;
+    },
+
+    coin : p => Math.random() < p,
+  };
+
+  const createLayers = () => {
+    for (let i = 0; i < settings.layers; i++) {
+      const layer = document.createElement('div');
+      document.body.appendChild(layer);
+
+      const blend = () => {
+        layer.style.mixBlendMode = f.randomItem(settings.blend.modes);
+        const delay = f.randomIntegerInclusive(settings.blend.delay.min, settings.blend.delay.max);
+        setTimeout(blend, delay);
+      }
+
+      const filter = () => {
+        const newFilter = {};
+
+        for (const property in settings.filter) {
+          if (property != 'delay') {
+            const {probability, min, max, def, symbol} = settings.filter[property];
+            newFilter[property] = f.coin(probability) ? f.randomIntegerInclusive(min, max) : def;
+            newFilter[property] = property + '(' + newFilter[property] + symbol + ')';
+          }
+        }
+
+        layer.style.filter = f.shuffleArray(Object.values(newFilter)).join(' ');
+        const delay = f.randomIntegerInclusive(settings.filter.delay.min, settings.filter.delay.max);
+        setTimeout(filter, delay);
+      }
+
+      const jitter = () => {
+        const x = f.randomIntegerInclusive(-settings.jitter.x, settings.jitter.x);
+        const y = f.randomIntegerInclusive(-settings.jitter.y, settings.jitter.y);
+        layer.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+        const delay = f.randomIntegerInclusive(settings.jitter.delay.min, settings.jitter.delay.max);
+        setTimeout(jitter, delay);
+      }
+
+      blend();
+      filter();
+      jitter();
+    }
+  }
+
+  createLayers();
+</script>
 
 </html>
