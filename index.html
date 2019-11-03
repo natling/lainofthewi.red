@@ -161,7 +161,7 @@
           if (property != 'delay') {
             const {probability, min, max, def, symbol} = settings.filter[property];
             newFilter[property] = f.coin(probability) ? f.randomIntegerInclusive(min, max) : def;
-            newFilter[property] = property + '(' + newFilter[property] + symbol + ')';
+            newFilter[property] = `${property}(${newFilter[property]}${symbol})`;
           }
         }
 
@@ -173,7 +173,7 @@
       const jitter = () => {
         const x = f.randomIntegerInclusive(-settings.jitter.x, settings.jitter.x);
         const y = f.randomIntegerInclusive(-settings.jitter.y, settings.jitter.y);
-        layer.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+        layer.style.transform = `translate(${x}px, ${y}px)`;
         const delay = f.randomIntegerInclusive(settings.jitter.delay.min, settings.jitter.delay.max);
         setTimeout(jitter, delay);
       }
